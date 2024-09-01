@@ -29,6 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           (route) => false,
           );
       } catch (e) {
+        print('Registration error: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Registration failed: $e')),
         );
