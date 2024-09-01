@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:login_client/src/api/api_service.dart';
 import 'register.dart';
 import '../pages/home.dart';
 
@@ -11,6 +12,31 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final ApiService _apiService = ApiService();
+
+  void _login() async {
+    final email = _emailController.text;
+    final password = _passwordController.text;
+
+    if (email.isNotEmpty && password.isNotEmpty) {
+      try {
+        final result = await _apiService.login(email, password);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      } catch (e) {
+        print('Login: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed: $e')),
+        );
+      }
+    } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter email and password')),
+        );
+      }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,21 +77,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () {
-                    final email = _emailController.text;
-                    final password = _passwordController.text;
+                  onPressed: _login,
+                  // onPressed: () {
+                  //   final email = _emailController.text;
+                  //   final password = _passwordController.text;
 
-                    if (email.isNotEmpty && password.isNotEmpty) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const HomeScreen()),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Please enter email and password')),
-                      );
-                    }
-                  },
+                  //   if (email.isNotEmpty && password.isNotEmpty) {
+                  //     Navigator.pushReplacement(
+                  //       context,
+                  //       MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  //     );
+                  //   } else {
+                  //     ScaffoldMessenger.of(context).showSnackBar(
+                  //       const SnackBar(content: Text('Please enter email and password')),
+                  //     );
+                  //   }
+                  // },
                   child: const Text('Login'),
                 ),
                 TextButton(

@@ -22,12 +22,27 @@ export class AuthService {
 
     async login(email: string, password: string): Promise<{ access_token: string }> {
         const user = await this.usersRepository.getUserByEmail(email);
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            throw new Error('invalid credentials');
-        }
-        const payload = { email: user.email};
-        return {
-            access_token: this.jwtService.sign(payload)
+        try {
+            if (!user) {
+                console.error(`User with email ${email} not found`);
+                throw new Error('invalid credentials');
+            }
+            console.log('password :', password);
+            console.log('user.password: ', user.password);
+            
+            
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            if (!isPasswordValid) {
+                console.error('Invalid credentials');
+                throw new Error('Invalid credentials');
+            }
+            const payload = { email: user.email};
+            return {
+                access_token: this.jwtService.sign(payload)
+            }
+        } catch (error) {
+            console.log('Login error: ', error);
+            throw error;
         }
     }
 

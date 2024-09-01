@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:login_client/src/api/api_service.dart';
 import '../pages/home.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -12,6 +13,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final ApiService _apiService = ApiService();
+
+  void _register() async {
+    final email = _emailController.text;
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    if (email.isNotEmpty && password.isNotEmpty && password == confirmPassword) {
+      try {
+        final result = await _apiService.register(email, password);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (route) => false,
+          );
+      } catch (e) {
+        print('Registration error: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration failed: $e')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter valid information'))
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,24 +80,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () {
-                    final email = _emailController.text;
-                    final password = _passwordController.text;
-                    final confirmPassword = _confirmPasswordController.text;
-
-                    if (email.isNotEmpty && password.isNotEmpty && password == confirmPassword) {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => const HomeScreen()),
-                        (route) => false,
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Please enter valid information')),
-                      );
-                    }
-                  },
+                  onPressed: _register,
                   child: const Text('Register'),
+                  // onPressed: () {
+                  //   final email = _emailController.text;
+                  //   final password = _passwordController.text;
+                  //   final confirmPassword = _confirmPasswordController.text;
+
+                  //   if (email.isNotEmpty && password.isNotEmpty && password == confirmPassword) {
+                  //     Navigator.pushAndRemoveUntil(
+                  //       context,
+                  //       MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  //       (route) => false,
+                  //     );
+                  //   } else {
+                  //     ScaffoldMessenger.of(context).showSnackBar(
+                  //       const SnackBar(content: Text('Please enter valid information')),
+                  //     );
+                  //   }
+                  // },
+                  // child: const Text('Register'),
                 ),
                 TextButton(
                   onPressed: () {
